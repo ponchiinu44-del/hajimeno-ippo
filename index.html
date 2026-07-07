@@ -516,69 +516,136 @@ function generatorHTML() {
   </div>`;
 }
 
+/* 入力を「/」「、」「・」「改行」で分解し、前後の記号を掃除して最大3項目に */
+function splitItems(s) {
+  return s.split(/[\/／、,，・\n]+/)
+    .map(x => x.trim().replace(/^[「『"']+|[」』"'。．!！]+$/g, ""))
+    .filter(Boolean)
+    .slice(0, 3);
+}
+
+/* 経験の列挙を自然な日本語に(1つ:「A」/ 2つ:「A」や「B」/ 3つ:「A」「B」「C」) */
+function expPhraseOf(items) {
+  if (items.length === 1) return `「${items[0]}」`;
+  if (items.length === 2) return `「${items[0]}」や「${items[1]}」`;
+  return items.map(i => `「${i}」`).join("");
+}
+
+/* 経験キーワード → 買い手に響く「強み」への翻訳表(ライターの型) */
+const STRENGTH_MAP = [
+  [/事務|経理|総務|庶務|データ入力|秘書/, "正確さと段取り力"],
+  [/接客|販売|営業|コールセンター|受付|飲食/, "相手の気持ちをくみ取る対応力"],
+  [/子育て|育児|主婦|主夫|家事/, "限られた時間をやりくりする調整力"],
+  [/文章|ライテ|ブログ|メール|記事|読書/, "伝わる文章を書く力"],
+  [/デザイン|イラスト|画像|写真|動画/, "見た目をわかりやすく整える表現力"],
+  [/パソコン|PC|IT|エクセル|Excel|スプレッドシート|プログラ|アプリ/, "ITツールを使いこなす実務力"],
+  [/教え|講師|先生|塾|研修|指導/, "むずかしいことを噛み砕いて伝える力"],
+  [/介護|看護|保育|医療|福祉/, "相手のペースに寄り添う丁寧さ"],
+  [/家計|節約|お金|投資|簿記/, "数字をコツコツ管理するマメさ"],
+  [/占い|カウンセ|相談|傾聴/, "話をじっくり聴いて言葉にする力"]
+];
+function strengthsOf(items) {
+  const found = [];
+  for (const [re, s] of STRENGTH_MAP) {
+    if (items.some(i => re.test(i)) && !found.includes(s)) found.push(s);
+    if (found.length === 2) break;
+  }
+  if (!found.length) found.push("コツコツ続ける継続力");
+  return found;
+}
+
 function generateProfile() {
-  const exp = (document.getElementById("gExp").value || "").trim();
-  const offer = (document.getElementById("gOffer").value || "").trim();
+  const expRaw = (document.getElementById("gExp").value || "").trim();
+  const offerRaw = (document.getElementById("gOffer").value || "").trim();
   const time = document.getElementById("gTime").value;
   const out = document.getElementById("genOut");
 
-  if (!exp || !offer) {
+  if (!expRaw || !offerRaw) {
     out.style.display = "block";
     out.innerHTML = `<div class="gen-variant"><pre>①と②をひとことでいいので埋めてみてください。「主婦歴10年」「メールを書くのが得意」くらいの気軽さでOKです🌱</pre></div>`;
     return;
   }
 
+  const expItems = splitItems(expRaw);
+  const expPhrase = expPhraseOf(expItems);
+  const strengths = strengthsOf(expItems);
+  const strengthLong = strengths.join("と、");
+  const strengthShort = strengths[0];
+  const offer = offerRaw.replace(/^[「『]+|[」』。．]+$/g, "");
+
   const timeMap = {
-    "30": { pace: "すきま時間を活用しているため、メッセージのお返事は1日1〜2回、丁寧にお返ししています。", speed: "コツコツ型" },
-    "60": { pace: "毎日決まった時間に作業しているので、ご連絡には当日〜翌日中にお返事しています。", speed: "安定ペース型" },
-    "120": { pace: "まとまった作業時間を確保しているので、スピーディーな対応が可能です。", speed: "しっかり対応型" }
+    "30":  { pace: "すきま時間での作業のため、メッセージのお返事は1日1〜2回になりますが、そのぶん一通ずつ丁寧にお返しします。", speed: "コツコツ型", reply: "1〜2日以内" },
+    "60":  { pace: "毎日決まった時間に作業しているので、ご連絡には当日〜翌日中にお返事できます。", speed: "安定ペース型", reply: "当日〜翌日中" },
+    "120": { pace: "まとまった作業時間を確保しているので、やりとりも作業もスピーディーに対応できます。", speed: "しっかり対応型", reply: "できる限り当日中" }
   };
   const t = timeMap[time];
 
   const variantA =
-`はじめまして、ご覧いただきありがとうございます。
+`はじめまして。数あるプロフィールの中からご覧いただき、ありがとうございます。
 
-これまで「${exp}」という経験を重ねてきました。
-その中で身についた、丁寧さ・段取り・相手の立場で考える姿勢を活かして、
-「${offer}」のお手伝いをしています。
+${expPhrase}。
+そんな毎日の中で身につけた${strengthLong}を活かして、「${offer}」のお手伝いをしています。
 
-【大切にしていること】
-・わかりやすい言葉でのやりとり
-・納期とお約束をきちんと守ること
-・小さなご相談でも、まず「聞く」こと
+【お約束すること】
+・専門用語を使わない、わかりやすいやりとり
+・納期と、できること・できないことを正直にお伝えすること
+・ご要望のヒアリングに、いちばん時間をかけること
 
 ${t.pace}
 
-初めてのご依頼でも、流れを一つずつご案内しますのでご安心ください。
-まずはお気軽にメッセージからどうぞ。`;
+初めてのご依頼でも、購入から納品までの流れを最初にご案内しますのでご安心ください。
+「まだ迷っている」段階のご相談も歓迎です。お気軽にメッセージをどうぞ。`;
 
   const variantB =
 `ご覧いただきありがとうございます!
 
-ふだんは「${exp}」をしている、いち生活者です。
-だからこそ、専門用語ではなく「となりの人に話すような言葉」で
-「${offer}」をお届けできるのが持ち味です。
+わたしの「これまで」は、${expPhrase}。
+派手な経歴ではないかもしれません。でも、ここで身についた${strengthShort}は本物だと思っています。
+だからこそ、むずかしい言葉を使わずに「となりの人に話すような距離感」で
+「${offer}」をお届けできます。
 
-正直、大きな実績はまだこれからです。
-そのぶん、ひとつひとつのご依頼に時間と気持ちをかけて向き合います。
+正直、ここでの実績はまだこれからです。
+そのぶん、ひとつひとつのご依頼に時間と気持ちをかけて向き合うと決めています。
 (${t.speed}なので、進み具合はこまめにご報告します!)
 
-「こんなこと頼んでいいのかな?」くらいの内容こそ大歓迎です。
+「こんなこと頼んでいいのかな?」くらいの内容こそ大歓迎。
 いっしょに、ちょうどいいかたちを見つけましょう🌱`;
+
+  const variantC =
+`【${offer}】を、まっすぐ丁寧に。
+
+＜わたしの強み＞
+${strengthLong}。${expPhrase}の日々で培いました。
+
+＜ご依頼の流れ＞
+1. まずはメッセージでご要望をお聞かせください(相談・見積もり無料)
+2. 内容・お届け日・料金をご提案します
+3. ご購入後に着手 → 途中経過をご報告 → 納品
+
+メッセージへのお返事は${t.reply}を心がけています。
+${t.pace}
+
+「これってお願いできますか?」の一言からで大丈夫です。
+最初の一件を、気持ちよくお取引できたら嬉しいです。`;
 
   out.style.display = "block";
   out.innerHTML = `
     <div class="gen-variant">
-      <h5>案1:きちんと安心タイプ</h5>
+      <h5>案1:きちんと安心タイプ(はじめての出品ならまずこれ)</h5>
       <pre id="varA">${escapeHtml(variantA)}</pre>
       <button class="copy-btn" type="button" onclick="copyText('varA', this)">コピーする</button>
     </div>
     <div class="gen-variant">
-      <h5>案2:親しみ・等身大タイプ</h5>
+      <h5>案2:親しみ・等身大タイプ(相談系・お話系のサービス向き)</h5>
       <pre id="varB">${escapeHtml(variantB)}</pre>
       <button class="copy-btn" type="button" onclick="copyText('varB', this)">コピーする</button>
     </div>
-    <p style="font-size:12px;color:#57776E;margin-top:4px">💡 このまま使わず、1〜2ヶ所を自分の言葉に直すと「あなたの文章」になります。</p>`;
+    <div class="gen-variant">
+      <h5>案3:てきぱき実務タイプ(代行・作成系のサービス向き)</h5>
+      <pre id="varC">${escapeHtml(variantC)}</pre>
+      <button class="copy-btn" type="button" onclick="copyText('varC', this)">コピーする</button>
+    </div>
+    <p style="font-size:12px;color:#57776E;margin-top:4px">💡 そのまま使わず、1〜2ヶ所を自分の言葉に直すと「あなたの文章」になります。強みの部分(${strengthLong})がしっくりこなければ、そこだけ差し替えるのがおすすめ。</p>`;
 }
 
 function escapeHtml(s) {
