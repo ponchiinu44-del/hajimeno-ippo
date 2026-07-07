@@ -516,136 +516,113 @@ function generatorHTML() {
   </div>`;
 }
 
-/* 入力を「/」「、」「・」「改行」で分解し、前後の記号を掃除して最大3項目に */
-function splitItems(s) {
-  return s.split(/[\/／、,，・\n]+/)
-    .map(x => x.trim().replace(/^[「『"']+|[」』"'。．!！]+$/g, ""))
-    .filter(Boolean)
-    .slice(0, 3);
-}
-
-/* 経験の列挙を自然な日本語に(1つ:「A」/ 2つ:「A」や「B」/ 3つ:「A」「B」「C」) */
-function expPhraseOf(items) {
-  if (items.length === 1) return `「${items[0]}」`;
-  if (items.length === 2) return `「${items[0]}」や「${items[1]}」`;
-  return items.map(i => `「${i}」`).join("");
-}
-
-/* 経験キーワード → 買い手に響く「強み」への翻訳表(ライターの型) */
-const STRENGTH_MAP = [
-  [/事務|経理|総務|庶務|データ入力|秘書/, "正確さと段取り力"],
-  [/接客|販売|営業|コールセンター|受付|飲食/, "相手の気持ちをくみ取る対応力"],
-  [/子育て|育児|主婦|主夫|家事/, "限られた時間をやりくりする調整力"],
-  [/文章|ライテ|ブログ|メール|記事|読書/, "伝わる文章を書く力"],
-  [/デザイン|イラスト|画像|写真|動画/, "見た目をわかりやすく整える表現力"],
-  [/パソコン|PC|IT|エクセル|Excel|スプレッドシート|プログラ|アプリ/, "ITツールを使いこなす実務力"],
-  [/教え|講師|先生|塾|研修|指導/, "むずかしいことを噛み砕いて伝える力"],
-  [/介護|看護|保育|医療|福祉/, "相手のペースに寄り添う丁寧さ"],
-  [/家計|節約|お金|投資|簿記/, "数字をコツコツ管理するマメさ"],
-  [/占い|カウンセ|相談|傾聴/, "話をじっくり聴いて言葉にする力"]
-];
-function strengthsOf(items) {
-  const found = [];
-  for (const [re, s] of STRENGTH_MAP) {
-    if (items.some(i => re.test(i)) && !found.includes(s)) found.push(s);
-    if (found.length === 2) break;
-  }
-  if (!found.length) found.push("コツコツ続ける継続力");
-  return found;
-}
-
 function generateProfile() {
-  const expRaw = (document.getElementById("gExp").value || "").trim();
-  const offerRaw = (document.getElementById("gOffer").value || "").trim();
+  const exp = (document.getElementById("gExp").value || "").trim();
+  const offer = (document.getElementById("gOffer").value || "").trim();
   const time = document.getElementById("gTime").value;
   const out = document.getElementById("genOut");
 
-  if (!expRaw || !offerRaw) {
+  if (!exp || !offer) {
     out.style.display = "block";
     out.innerHTML = `<div class="gen-variant"><pre>①と②をひとことでいいので埋めてみてください。「主婦歴10年」「メールを書くのが得意」くらいの気軽さでOKです🌱</pre></div>`;
     return;
   }
 
-  const expItems = splitItems(expRaw);
-  const expPhrase = expPhraseOf(expItems);
-  const strengths = strengthsOf(expItems);
-  const strengthLong = strengths.join("と、");
-  const strengthShort = strengths[0];
-  const offer = offerRaw.replace(/^[「『]+|[」』。．]+$/g, "");
-
   const timeMap = {
-    "30":  { pace: "すきま時間での作業のため、メッセージのお返事は1日1〜2回になりますが、そのぶん一通ずつ丁寧にお返しします。", speed: "コツコツ型", reply: "1〜2日以内" },
-    "60":  { pace: "毎日決まった時間に作業しているので、ご連絡には当日〜翌日中にお返事できます。", speed: "安定ペース型", reply: "当日〜翌日中" },
-    "120": { pace: "まとまった作業時間を確保しているので、やりとりも作業もスピーディーに対応できます。", speed: "しっかり対応型", reply: "できる限り当日中" }
+    "30": { pace: "すきま時間を活用しているため、メッセージのお返事は1日1〜2回、丁寧にお返ししています。", speed: "コツコツ型" },
+    "60": { pace: "毎日決まった時間に作業しているので、ご連絡には当日〜翌日中にお返事しています。", speed: "安定ペース型" },
+    "120": { pace: "まとまった作業時間を確保しているので、スピーディーな対応が可能です。", speed: "しっかり対応型" }
   };
   const t = timeMap[time];
+  const strengths = translateToStrengths(exp);
 
   const variantA =
-`はじめまして。数あるプロフィールの中からご覧いただき、ありがとうございます。
+`はじめまして、ご覧いただきありがとうございます。
 
-${expPhrase}。
-そんな毎日の中で身につけた${strengthLong}を活かして、「${offer}」のお手伝いをしています。
+「${exp}」という経験を通して、
+${strengths.listA}を大切にしてきました。
 
-【お約束すること】
-・専門用語を使わない、わかりやすいやりとり
-・納期と、できること・できないことを正直にお伝えすること
-・ご要望のヒアリングに、いちばん時間をかけること
+その積み重ねを活かして、
+「${offer}」のお手伝いをしています。
+
+【大切にしていること】
+・わかりやすい言葉でのやりとり
+・納期とお約束をきちんと守ること
+・小さなご相談でも、まず「聞く」こと
 
 ${t.pace}
 
-初めてのご依頼でも、購入から納品までの流れを最初にご案内しますのでご安心ください。
-「まだ迷っている」段階のご相談も歓迎です。お気軽にメッセージをどうぞ。`;
+初めてのご依頼でも、流れを一つずつご案内しますのでご安心ください。
+まずはお気軽にメッセージからどうぞ。`;
 
   const variantB =
 `ご覧いただきありがとうございます!
 
-わたしの「これまで」は、${expPhrase}。
-派手な経歴ではないかもしれません。でも、ここで身についた${strengthShort}は本物だと思っています。
-だからこそ、むずかしい言葉を使わずに「となりの人に話すような距離感」で
-「${offer}」をお届けできます。
+ふだんは「${exp}」をしている、いち生活者です。
+そこで自然と身についた${strengths.listB}を武器に、
+「${offer}」をお届けできるのが持ち味です。
 
-正直、ここでの実績はまだこれからです。
-そのぶん、ひとつひとつのご依頼に時間と気持ちをかけて向き合うと決めています。
+正直、大きな実績はまだこれからです。
+そのぶん、ひとつひとつのご依頼に時間と気持ちをかけて向き合います。
 (${t.speed}なので、進み具合はこまめにご報告します!)
 
-「こんなこと頼んでいいのかな?」くらいの内容こそ大歓迎。
+「こんなこと頼んでいいのかな?」くらいの内容こそ大歓迎です。
 いっしょに、ちょうどいいかたちを見つけましょう🌱`;
-
-  const variantC =
-`【${offer}】を、まっすぐ丁寧に。
-
-＜わたしの強み＞
-${strengthLong}。${expPhrase}の日々で培いました。
-
-＜ご依頼の流れ＞
-1. まずはメッセージでご要望をお聞かせください(相談・見積もり無料)
-2. 内容・お届け日・料金をご提案します
-3. ご購入後に着手 → 途中経過をご報告 → 納品
-
-メッセージへのお返事は${t.reply}を心がけています。
-${t.pace}
-
-「これってお願いできますか?」の一言からで大丈夫です。
-最初の一件を、気持ちよくお取引できたら嬉しいです。`;
 
   out.style.display = "block";
   out.innerHTML = `
     <div class="gen-variant">
-      <h5>案1:きちんと安心タイプ(はじめての出品ならまずこれ)</h5>
+      <h5>案1:きちんと安心タイプ</h5>
       <pre id="varA">${escapeHtml(variantA)}</pre>
       <button class="copy-btn" type="button" onclick="copyText('varA', this)">コピーする</button>
     </div>
     <div class="gen-variant">
-      <h5>案2:親しみ・等身大タイプ(相談系・お話系のサービス向き)</h5>
+      <h5>案2:親しみ・等身大タイプ</h5>
       <pre id="varB">${escapeHtml(variantB)}</pre>
       <button class="copy-btn" type="button" onclick="copyText('varB', this)">コピーする</button>
     </div>
-    <div class="gen-variant">
-      <h5>案3:てきぱき実務タイプ(代行・作成系のサービス向き)</h5>
-      <pre id="varC">${escapeHtml(variantC)}</pre>
-      <button class="copy-btn" type="button" onclick="copyText('varC', this)">コピーする</button>
-    </div>
-    <p style="font-size:12px;color:#57776E;margin-top:4px">💡 そのまま使わず、1〜2ヶ所を自分の言葉に直すと「あなたの文章」になります。強みの部分(${strengthLong})がしっくりこなければ、そこだけ差し替えるのがおすすめ。</p>`;
+    <p style="font-size:12px;color:#57776E;margin-top:4px">💡 このまま使わず、1〜2ヶ所を自分の言葉に直すと「あなたの文章」になります。</p>`;
+}
+
+/* ----------------------------------------------------------------
+   キーワード → 強みの言い換え辞書
+   「経験」の生の入力に含まれる語から、ビジネス的な強みの言葉を
+   1〜2個選んで差し込む。テンプレのままでも「気の利いた翻訳」に
+   見えるようにするための軽量ロジック(API不使用)。
+---------------------------------------------------------------- */
+const STRENGTH_DICT = [
+  { keys: ["主婦","家事","子育て","育児","ワンオペ"],
+    a: "段取り力と、限られた時間をやりくりする工夫",
+    b: "同時にいくつも回す段取り力と、突発対応への強さ" },
+  { keys: ["事務","経理","総務","秘書","データ入力"],
+    a: "正確さと、細かい確認を怠らない姿勢",
+    b: "ミスを防ぐ確認グセと、地味な作業をコツコツ続ける力" },
+  { keys: ["接客","販売","営業","カスタマー","電話対応"],
+    a: "相手の状況を汲み取る力と、感じよく伝える言葉選び",
+    b: "初対面でも安心してもらえる、感じの良いコミュニケーション" },
+  { keys: ["教員","講師","先生","保育","塾"],
+    a: "相手のレベルに合わせて説明を変える力",
+    b: "わかりやすく噛み砕いて伝える力" },
+  { keys: ["デザイン","イラスト","写真","動画","クリエイ"],
+    a: "見る人の気持ちを想像しながら形にする感性",
+    b: "「これでいいか」で終わらせない仕上げへのこだわり" },
+  { keys: ["ライティング","ブログ","文章","記事","note"],
+    a: "伝わる順番を考えて言葉を組み立てる力",
+    b: "読み手の「?」を先回りして埋める書き方" },
+  { keys: ["エンジニア","プログラ","IT","システム"],
+    a: "問題を分解して筋道立てて解決する力",
+    b: "「なぜ動かないか」を粘り強く突き止める力" },
+  { keys: ["経営","起業","フリーランス","個人事業"],
+    a: "自分で決めて、自分で最後までやり切る力",
+    b: "誰かの指示を待たずに動く自走力" }
+];
+
+const DEFAULT_STRENGTH = { a: "丁寧さと、最後までやり抜く粘り強さ", b: "地道な積み重ねを面倒くさがらない性格" };
+
+function translateToStrengths(expText) {
+  const hit = STRENGTH_DICT.find(entry => entry.keys.some(k => expText.includes(k)));
+  const chosen = hit || DEFAULT_STRENGTH;
+  return { listA: chosen.a, listB: chosen.b };
 }
 
 function escapeHtml(s) {
