@@ -302,7 +302,13 @@ footer a{color:var(--mint-deep);font-weight:700}
 
 const AFF_LINKS = {
   coconala: "https://px.a8.net/svt/ejp?a8mat=4B7VKV+61BA4I+2PEO+1HL85U",
-  crowdworks: "#"     // ← A8のクラウドワークス案件URLに差し替え
+  crowdworks: "https://crowdworks.jp/"  // 一時的に通常URL（A8審査中）。発行後はアフィリンクに差し替え、AFF_RELSもsponsored付きに戻す
+};
+
+// リンク別のrel属性。アフィリンクは nofollow sponsored 必須、通常リンクは noopener のみ。
+const AFF_RELS = {
+  coconala: "noopener nofollow sponsored",
+  crowdworks: "noopener"  // ← アフィリンク発行後は "noopener nofollow sponsored" に戻す
 };
 
 // A8インプレッション計測用1x1画像（PRスロット内に出力。未取得の案件は空文字）
@@ -636,11 +642,12 @@ function copyText(id, btn) {
 /* ---------- PR slot ---------- */
 function prHTML(pr) {
   const href = AFF_LINKS[pr.link] || "#";
+  const rel = AFF_RELS[pr.link] || "noopener nofollow sponsored";
   const imp = AFF_IMPRESSIONS[pr.link] || "";
   return `
   <div class="pr-slot">
     <span class="pr-mark">PR</span>${pr.text}<br>
-    → <a href="${href}" target="_blank" rel="noopener nofollow sponsored">${pr.label}</a>
+    → <a href="${href}" target="_blank" rel="${rel}">${pr.label}</a>
     ${imp}
   </div>`;
 }
