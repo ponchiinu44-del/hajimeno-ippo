@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>はじめの一歩マップ｜初収益までの道のり</title>
+<meta name="description" content="副業の最初の1件まで、今日やること1個だけ。7日間の道のりマップ。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --mint:#3EC29E;
+  --mint-soft:#D8F3E8;
+  --mint-deep:#0E6B57;
+  --ink:#22423B;
+  --bg:#F2FBF7;
+  --card:#FFFFFF;
+  --sun:#FFB94A;
+  --sun-soft:#FFF3DC;
+  --line:#CBEADF;
+  --gray:#8AA69D;
+  --radius:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Noto Sans JP',sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:560px;margin:0 auto;padding:0 18px 80px}
+
+/* ===== header ===== */
+header{padding:44px 0 10px;text-align:center}
+.eyebrow{
+  display:inline-block;
+  font-size:12px;font-weight:700;letter-spacing:.14em;
+  color:var(--mint-deep);
+  background:var(--mint-soft);
+  padding:4px 14px;border-radius:999px;
+  margin-bottom:14px;
+}
+h1{
+  font-family:'Zen Maru Gothic',sans-serif;
+  font-weight:900;font-size:clamp(26px,7vw,34px);
+  line-height:1.4;letter-spacing:.02em;
+}
+h1 .accent{color:var(--mint);}
+.lead{
+  margin-top:12px;font-size:14px;color:#4B6B62;
+}
+.lead strong{color:var(--mint-deep)}
+
+/* ===== type selector ===== */
+.type-row{
+  display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
+  margin:22px 0 6px;
+}
+.type-chip{
+  font-family:'Zen Maru Gothic',sans-serif;font-weight:700;
+  font-size:13px;padding:8px 16px;border-radius:999px;
+  border:2px solid var(--line);background:#fff;color:var(--gray);
+}
+.type-chip.active{
+  border-color:var(--mint);background:var(--mint);color:#fff;
+  box-shadow:0 4px 14px rgba(62,194,158,.35);
+}
+.type-chip.soon{opacity:.55}
+.type-chip.soon small{font-size:10px;display:block;line-height:1}
+
+/* ===== progress bar ===== */
+.progress-card{
+  background:var(--card);border-radius:var(--radius);
+  padding:16px 20px;margin:18px 0 8px;
+  box-shadow:0 6px 20px rgba(34,66,59,.06);
+  display:flex;align-items:center;gap:14px;
+}
+.progress-track{flex:1;height:10px;background:var(--mint-soft);border-radius:999px;overflow:hidden}
+.progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--mint),#6FD9BC);border-radius:999px;transition:width .5s ease}
+.progress-label{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:13px;color:var(--mint-deep);white-space:nowrap}
+.reset-note{font-size:11px;color:var(--gray);text-align:center;margin-bottom:10px}
+
+/* ===== path ===== */
+.path{position:relative;padding:10px 0 0 6px;margin-top:18px}
+.path::before{
+  content:"";position:absolute;left:27px;top:20px;bottom:20px;
+  border-left:3px dashed var(--line);
+}
+.step{position:relative;padding:0 0 14px 62px}
+.node{
+  position:absolute;left:6px;top:2px;
+  width:44px;height:44px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Zen Maru Gothic',sans-serif;font-weight:900;font-size:15px;
+  background:#fff;border:3px solid var(--line);color:var(--gray);
+  z-index:1;transition:all .3s;
+}
+.step.done .node{background:var(--mint);border-color:var(--mint);color:#fff}
+.step.today .node{
+  background:var(--sun);border-color:var(--sun);color:#fff;
+  box-shadow:0 0 0 6px var(--sun-soft);
+  animation:pulse 2.2s infinite;
+}
+@keyframes pulse{
+  0%,100%{box-shadow:0 0 0 6px var(--sun-soft)}
+  50%{box-shadow:0 0 0 11px rgba(255,185,74,.18)}
+}
+@media (prefers-reduced-motion: reduce){
+  .step.today .node{animation:none}
+}
+.today-badge{
+  position:absolute;left:-4px;top:-14px;
+  font-size:10px;font-weight:700;color:#fff;
+  background:var(--sun);padding:2px 8px;border-radius:999px;z-index:2;
+}
+.step.locked{opacity:.55}
+
+/* step card */
+.step-card{
+  background:var(--card);border-radius:var(--radius);
+  padding:18px 20px;
+  box-shadow:0 6px 20px rgba(34,66,59,.06);
+}
+.step.today .step-card{border:2px solid var(--sun);box-shadow:0 10px 28px rgba(255,185,74,.18)}
+.step-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;cursor:pointer}
+.step-title{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:16px}
+.step-status{font-size:11px;color:var(--gray);white-space:nowrap}
+.step.done .step-status{color:var(--mint-deep);font-weight:700}
+.step-body{display:none;margin-top:12px;font-size:14px}
+.step.today .step-body,.step.open .step-body{display:block}
+.why{
+  background:var(--mint-soft);border-radius:12px;
+  padding:10px 14px;font-size:13px;color:var(--mint-deep);
+  margin-bottom:12px;
+}
+.why b{font-weight:700}
+.todo{list-style:none;margin:10px 0}
+.todo li{
+  position:relative;padding:8px 0 8px 30px;border-bottom:1px dashed var(--line);
+  font-size:14px;
+}
+.todo li:last-child{border-bottom:none}
+.todo li::before{
+  content:"✿";position:absolute;left:4px;color:var(--mint);font-size:14px;
+}
+.tip{
+  font-size:12.5px;color:#57776E;background:#F7FCFA;
+  border-left:3px solid var(--mint);border-radius:0 10px 10px 0;
+  padding:8px 12px;margin-top:10px;
+}
+.done-btn{
+  display:block;width:100%;margin-top:16px;
+  font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:15px;
+  color:#fff;background:var(--mint);border:none;border-radius:999px;
+  padding:13px 0;cursor:pointer;
+  box-shadow:0 6px 16px rgba(62,194,158,.35);
+  transition:transform .15s;
+}
+.done-btn:hover{transform:translateY(-2px)}
+.done-btn:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.undone-btn{
+  display:block;margin:10px auto 0;font-size:12px;color:var(--gray);
+  background:none;border:none;cursor:pointer;text-decoration:underline;
+}
+
+/* ===== generator ===== */
+.gen{
+  margin-top:14px;background:linear-gradient(160deg,#F4FDF9,#EAF9F2);
+  border:2px solid var(--mint-soft);border-radius:14px;padding:16px;
+}
+.gen h4{
+  font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:14.5px;
+  color:var(--mint-deep);margin-bottom:4px;
+}
+.gen p.gnote{font-size:12px;color:#57776E;margin-bottom:12px}
+.gen label{display:block;font-size:12.5px;font-weight:700;margin:10px 0 4px;color:var(--ink)}
+.gen textarea,.gen select{
+  width:100%;border:2px solid var(--line);border-radius:10px;
+  padding:9px 12px;font-size:14px;font-family:inherit;color:var(--ink);
+  background:#fff;
+}
+.gen textarea{min-height:64px;resize:vertical}
+.gen textarea:focus,.gen select:focus{outline:none;border-color:var(--mint)}
+.gen-btn{
+  display:block;width:100%;margin-top:14px;
+  font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:14px;
+  color:var(--mint-deep);background:#fff;border:2px solid var(--mint);
+  border-radius:999px;padding:11px 0;cursor:pointer;transition:all .15s;
+}
+.gen-btn:hover{background:var(--mint);color:#fff}
+.gen-out{margin-top:14px;display:none}
+.gen-variant{
+  background:#fff;border-radius:12px;padding:14px;margin-bottom:10px;
+  border:1px solid var(--line);
+}
+.gen-variant h5{
+  font-size:12px;color:var(--mint-deep);font-weight:700;margin-bottom:6px;
+}
+.gen-variant pre{
+  white-space:pre-wrap;font-family:inherit;font-size:13.5px;line-height:1.8;
+}
+.copy-btn{
+  margin-top:8px;font-size:12px;font-weight:700;color:var(--mint-deep);
+  background:var(--mint-soft);border:none;border-radius:999px;
+  padding:6px 14px;cursor:pointer;
+}
+.copy-btn:active{background:var(--mint);color:#fff}
+
+/* ===== PR slot ===== */
+.pr-slot{
+  margin-top:14px;background:var(--sun-soft);
+  border-radius:12px;padding:12px 14px;font-size:13px;
+}
+.pr-slot .pr-mark{
+  display:inline-block;font-size:10.5px;font-weight:700;color:#9A6B14;
+  border:1px solid #E4B95F;border-radius:4px;padding:0 5px;margin-right:6px;
+}
+.pr-slot a{color:var(--mint-deep);font-weight:700}
+
+/* ===== goal / footer ===== */
+.goal{
+  text-align:center;margin-top:6px;padding:26px 20px;
+  background:linear-gradient(160deg,var(--mint),#59CFAE);
+  border-radius:var(--radius);color:#fff;
+}
+.goal .flag{font-size:34px}
+.goal h3{font-family:'Zen Maru Gothic',sans-serif;font-weight:900;font-size:19px;margin-top:6px}
+.goal p{font-size:13px;margin-top:6px;opacity:.95}
+footer{
+  margin-top:36px;text-align:center;font-size:12px;color:var(--gray);
+}
+footer a{color:var(--mint-deep);font-weight:700}
+.foot-links{margin-bottom:10px}
+.celebrate{
+  position:fixed;inset:0;display:none;align-items:center;justify-content:center;
+  background:rgba(34,66,59,.45);z-index:50;padding:20px;
+}
+.celebrate .box{
+  background:#fff;border-radius:20px;padding:30px 26px;text-align:center;
+  max-width:340px;box-shadow:0 20px 60px rgba(0,0,0,.25);
+}
+.celebrate .box .big{font-size:44px}
+.celebrate .box h3{font-family:'Zen Maru Gothic',sans-serif;font-weight:900;margin:8px 0 6px}
+.celebrate .box p{font-size:13.5px;color:#4B6B62}
+.celebrate .box button{
+  margin-top:16px;font-family:'Zen Maru Gothic',sans-serif;font-weight:700;
+  background:var(--mint);color:#fff;border:none;border-radius:999px;
+  padding:11px 30px;font-size:14px;cursor:pointer;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <span class="eyebrow">🌱 副業0→1のための</span>
+  <h1>はじめの一歩<span class="accent">マップ</span></h1>
+  <p class="lead">初収益までの道のりを7歩に分けました。<br>見るのは<strong>「今日の1歩」だけ</strong>でOKです。</p>
+</header>
+
+<div class="type-row">
+  <button class="type-chip active" type="button">ココナラ型</button>
+  <button class="type-chip soon" type="button" disabled>クラウドワークス型<small>準備中</small></button>
+  <button class="type-chip soon" type="button" disabled>コンテンツ販売型<small>準備中</small></button>
+</div>
+
+<div class="progress-card">
+  <span class="progress-label" id="progressLabel">0 / 7 歩</span>
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+</div>
+<p class="reset-note">※ 進捗はこのブラウザに自動保存されます ・ <a href="#" onclick="resetAll(event)" style="color:var(--gray)">最初からやり直す</a></p>
+
+<div class="path" id="path"></div>
+
+<div class="goal" id="goal">
+  <div class="flag">🚩</div>
+  <h3>ゴール:はじめての1件</h3>
+  <p>7歩さきで待ってます。<br>1日1歩で、ちょうど1週間。</p>
+</div>
+
+<footer>
+  <div class="foot-links">
+    まだタイプ診断がまだの人は →
+    <a href="https://ponchiinu44-del.github.io/fukugyou-shindan/" target="_blank" rel="noopener">副業タイプ診断</a>
+  </div>
+  © ぴっぴ｜AI × 副業
+</footer>
+</div>
+
+<div class="celebrate" id="celebrate">
+  <div class="box">
+    <div class="big" id="celebEmoji">🎉</div>
+    <h3 id="celebTitle">1歩クリア!</h3>
+    <p id="celebText">その調子です。つづきはまた明日でも、今日でも。</p>
+    <button type="button" onclick="closeCelebrate()">つぎへ</button>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   はじめの一歩マップ v1(ココナラ型)
+   進捗はメモリ内のみ(リロードでリセット)。
+   アフィリエイトリンクは AFF_LINKS を書き換えて使う。
+============================================================ */
+
+const AFF_LINKS = {
+  coconala: "https://px.a8.net/svt/ejp?a8mat=4B7VKV+61BA4I+2PEO+1HL85U",
+  crowdworks: "#"     // ← A8のクラウドワークス案件URLに差し替え
+};
+
+// A8インプレッション計測用1x1画像（PRスロット内に出力。未取得の案件は空文字）
+const AFF_IMPRESSIONS = {
+  coconala: '<img border="0" width="1" height="1" src="https://www11.a8.net/0.gif?a8mat=4B7VKV+61BA4I+2PEO+1HL85U" alt="">',
+  crowdworks: ""
+};
+
+const STEPS = [
+  {
+    title: "プロフィールを作る",
+    why: "購入者は商品よりも先に<b>「この人だいじょうぶ?」</b>を見ています。実績ゼロでも、プロフィールで安心してもらえれば十分戦えます。",
+    todos: [
+      "下のジェネレーターで、プロフィール文を作る",
+      "できた文を自分の言葉に少しなおす",
+      "顔出し不要のアイコンを設定する(イラストや風景でOK)"
+    ],
+    tip: "「実績がないから書けない」は逆です。これまでの仕事・家事・趣味は、ぜんぶ材料になります。",
+    generator: true
+  },
+  {
+    title: "出品する商品を1つ決める",
+    why: "商品はたくさん要りません。<b>最初の1つ</b>を決めるだけ。迷ったら「自分が人に頼まれたことがあること」が正解です。",
+    todos: [
+      "3つの型から選ぶ:「経験切り売り型」(相談にのる・教える)/「代行型」(文字起こし・リサーチ・資料づくり)/「作成型」(画像・文章・データ作成)",
+      "その中で「30分あればできること」に絞る",
+      "商品名を仮でいいので1行書いてみる"
+    ],
+    tip: "完璧な商品を選ぼうとしなくて大丈夫。最初の1つは「練習台」。売れてから育てます。",
+    pr: { text: "ココナラの登録がまだの人はこちらから(無料)", link: "coconala", label: "ココナラに無料登録する" }
+  },
+  {
+    title: "出品文を書く",
+    why: "売れる出品文には型があります。<b>順番どおりに埋めるだけ</b>で、それっぽくなります。",
+    todos: [
+      "① どんな人の、どんな悩みに向けたサービスか(2行)",
+      "② 具体的に何をするか(箇条書き3つ)",
+      "③ 購入から納品までの流れ(3ステップ)",
+      "④ ひとこと自己紹介(Day1のプロフィールから抜粋)"
+    ],
+    tip: "うまく書けない部分はAIに「この内容で出品文の下書きを作って」と頼めばOK。たたき台があると一気に進みます。"
+  },
+  {
+    title: "価格を決める",
+    why: "最初の価格は<b>「利益」ではなく「実績」を買うための値段</b>です。安すぎて悔しいくらいでちょうどいいです。",
+    todos: [
+      "同じジャンルの出品を3つ見て、最低価格帯を確認する",
+      "その最低価格帯に合わせる(最初だけ!)",
+      "「実績3件たまったら値上げする」と決めてメモしておく"
+    ],
+    tip: "安売りが不安なときは「初回限定価格」と書きましょう。あとで堂々と値上げできます。"
+  },
+  {
+    title: "サンプルを1個作る",
+    why: "実績ゼロの不安は<b>「見せられるもの」が1個あるだけ</b>でほぼ解消します。架空の依頼でいいので作ってみましょう。",
+    todos: [
+      "自分の商品を「架空のお客さん」から頼まれたつもりで1個作る",
+      "作ったものをサンプル画像・サンプル文として出品ページに載せる",
+      "作るのにかかった時間をメモする(納期設定の材料になります)"
+    ],
+    tip: "ここが一番時間がかかる日です。今日はこれだけでOK。他のことはしなくていいです。"
+  },
+  {
+    title: "公開して、見つけてもらう準備",
+    why: "出品は公開して終わりではなく、<b>検索で見つかる工夫</b>までがセットです。ここで差がつきます。",
+    todos: [
+      "商品タイトルに「お客さんが検索しそうな言葉」を入れる(例:○○ 代行、○○ 相談)",
+      "カテゴリとタグを、迷ったら一番人が多そうなものに設定",
+      "対応可能ステータスを「受付中」にする"
+    ],
+    tip: "タイトルは「自分が言いたいこと」より「相手が探す言葉」。ここだけはお客さん目線に切り替えましょう。",
+    pr: { text: "仕事を探しに行くスタイルも並行すると初収益が早まります", link: "crowdworks", label: "クラウドワークスに無料登録する" }
+  },
+  {
+    title: "待ち方と、待つ間にやること",
+    why: "公開直後に売れないのは<b>全員そう</b>です。ここで消えるか、淡々と続けるかで0→1が決まります。",
+    todos: [
+      "「公開リクエスト(お客さんからの募集)」に1件応募してみる",
+      "3日にいちど、出品文かプロフィールをひとこと磨く",
+      "SNSやってる人は「こんなサービス始めました」と1回だけ告知"
+    ],
+    tip: "最初の1件は「待つ」より「小さく動きながら待つ」。1週間〜1ヶ月かかるのが普通なので、焦らなくて大丈夫です。"
+  }
+];
+
+/* ---------- state (saved in browser when available) ---------- */
+const STORE_KEY = "ippo-map-coconala-v1";
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw) {
+      const arr = JSON.parse(raw);
+      if (Array.isArray(arr) && arr.length === STEPS.length) return arr.map(Boolean);
+    }
+  } catch (e) { /* 保存が使えない環境ではメモリ保持にフォールバック */ }
+  return STEPS.map(() => false);
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify(state));
+  } catch (e) { /* 保存不可でも動作は続行 */ }
+}
+
+const state = loadState();
+let doneCount = state.filter(Boolean).length;
+
+/* ---------- render ---------- */
+const pathEl = document.getElementById("path");
+
+function render() {
+  pathEl.innerHTML = "";
+  const current = state.findIndex(d => !d); // -1 = all done
+  STEPS.forEach((s, i) => {
+    const div = document.createElement("div");
+    div.className = "step" +
+      (state[i] ? " done" : "") +
+      (i === current ? " today" : "") +
+      (!state[i] && i !== current ? " locked" : "");
+    const statusText = state[i] ? "クリア ✓" : (i === current ? "" : "🔒 まだ先のはなし");
+    div.innerHTML = `
+      ${i === current ? '<span class="today-badge">きょう</span>' : ''}
+      <div class="node">${state[i] ? "✓" : i + 1}</div>
+      <div class="step-card">
+        <div class="step-head" onclick="toggleStep(${i})">
+          <span class="step-title">${s.title}</span>
+          <span class="step-status">${statusText}</span>
+        </div>
+        <div class="step-body">
+          <div class="why">${s.why}</div>
+          <ul class="todo">${s.todos.map(t => `<li>${t}</li>`).join("")}</ul>
+          ${s.tip ? `<div class="tip">💡 ${s.tip}</div>` : ""}
+          ${s.generator ? generatorHTML() : ""}
+          ${s.pr ? prHTML(s.pr) : ""}
+          ${!state[i] ? `<button class="done-btn" onclick="completeStep(${i})">今日の1歩、できた!</button>`
+                       : `<button class="undone-btn" onclick="uncompleteStep(${i})">やっぱり未完了に戻す</button>`}
+        </div>
+      </div>`;
+    pathEl.appendChild(div);
+  });
+  const fill = Math.round(doneCount / STEPS.length * 100);
+  document.getElementById("progressFill").style.width = fill + "%";
+  document.getElementById("progressLabel").textContent = `${doneCount} / ${STEPS.length} 歩`;
+}
+
+function toggleStep(i) {
+  const el = pathEl.children[i];
+  if (el.classList.contains("today")) return;
+  el.classList.toggle("open");
+}
+
+function completeStep(i) {
+  state[i] = true;
+  doneCount = state.filter(Boolean).length;
+  saveState();
+  render();
+  const allDone = doneCount === STEPS.length;
+  showCelebrate(allDone);
+  if (!allDone) {
+    const next = state.findIndex(d => !d);
+    setTimeout(() => {
+      pathEl.children[next]?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 300);
+  }
+}
+
+function uncompleteStep(i) {
+  state[i] = false;
+  doneCount = state.filter(Boolean).length;
+  saveState();
+  render();
+}
+
+/* ---------- celebrate ---------- */
+const celebrateEl = document.getElementById("celebrate");
+function showCelebrate(final) {
+  document.getElementById("celebEmoji").textContent = final ? "🚩🎉" : "🎉";
+  document.getElementById("celebTitle").textContent = final ? "7歩ぜんぶクリア!" : "1歩クリア!";
+  document.getElementById("celebText").textContent = final
+    ? "あとは最初の1件を迎えにいくだけ。ここまで来たあなたは、もう「やってる人」です。"
+    : "その調子です。つづきはまた明日でも、今日でも。";
+  celebrateEl.style.display = "flex";
+}
+function closeCelebrate() { celebrateEl.style.display = "none"; }
+
+/* ---------- profile generator ---------- */
+function generatorHTML() {
+  return `
+  <div class="gen">
+    <h4>🪄 プロフィール文ジェネレーター</h4>
+    <p class="gnote">3つ答えるだけ。実績ゼロでも信頼感の出る文章を2案つくります。</p>
+    <label for="gExp">① これまでやってきたこと(仕事・家事・趣味、なんでもOK)</label>
+    <textarea id="gExp" placeholder="例:事務の仕事を5年 / 子育て中 / 家計簿が好き"></textarea>
+    <label for="gOffer">② 提供したいこと</label>
+    <textarea id="gOffer" placeholder="例:資料づくりの代行 / 家計の相談にのる"></textarea>
+    <label for="gTime">③ 1日に使える時間</label>
+    <select id="gTime">
+      <option value="30">30分くらい</option>
+      <option value="60" selected>1時間くらい</option>
+      <option value="120">2時間以上</option>
+    </select>
+    <button class="gen-btn" type="button" onclick="generateProfile()">プロフィール文をつくる ✨</button>
+    <div class="gen-out" id="genOut"></div>
+  </div>`;
+}
+
+function generateProfile() {
+  const exp = (document.getElementById("gExp").value || "").trim();
+  const offer = (document.getElementById("gOffer").value || "").trim();
+  const time = document.getElementById("gTime").value;
+  const out = document.getElementById("genOut");
+
+  if (!exp || !offer) {
+    out.style.display = "block";
+    out.innerHTML = `<div class="gen-variant"><pre>①と②をひとことでいいので埋めてみてください。「主婦歴10年」「メールを書くのが得意」くらいの気軽さでOKです🌱</pre></div>`;
+    return;
+  }
+
+  const timeMap = {
+    "30": { pace: "すきま時間を活用しているため、メッセージのお返事は1日1〜2回、丁寧にお返ししています。", speed: "コツコツ型" },
+    "60": { pace: "毎日決まった時間に作業しているので、ご連絡には当日〜翌日中にお返事しています。", speed: "安定ペース型" },
+    "120": { pace: "まとまった作業時間を確保しているので、スピーディーな対応が可能です。", speed: "しっかり対応型" }
+  };
+  const t = timeMap[time];
+
+  const variantA =
+`はじめまして、ご覧いただきありがとうございます。
+
+これまで「${exp}」という経験を重ねてきました。
+その中で身についた、丁寧さ・段取り・相手の立場で考える姿勢を活かして、
+「${offer}」のお手伝いをしています。
+
+【大切にしていること】
+・わかりやすい言葉でのやりとり
+・納期とお約束をきちんと守ること
+・小さなご相談でも、まず「聞く」こと
+
+${t.pace}
+
+初めてのご依頼でも、流れを一つずつご案内しますのでご安心ください。
+まずはお気軽にメッセージからどうぞ。`;
+
+  const variantB =
+`ご覧いただきありがとうございます!
+
+ふだんは「${exp}」をしている、いち生活者です。
+だからこそ、専門用語ではなく「となりの人に話すような言葉」で
+「${offer}」をお届けできるのが持ち味です。
+
+正直、大きな実績はまだこれからです。
+そのぶん、ひとつひとつのご依頼に時間と気持ちをかけて向き合います。
+(${t.speed}なので、進み具合はこまめにご報告します!)
+
+「こんなこと頼んでいいのかな?」くらいの内容こそ大歓迎です。
+いっしょに、ちょうどいいかたちを見つけましょう🌱`;
+
+  out.style.display = "block";
+  out.innerHTML = `
+    <div class="gen-variant">
+      <h5>案1:きちんと安心タイプ</h5>
+      <pre id="varA">${escapeHtml(variantA)}</pre>
+      <button class="copy-btn" type="button" onclick="copyText('varA', this)">コピーする</button>
+    </div>
+    <div class="gen-variant">
+      <h5>案2:親しみ・等身大タイプ</h5>
+      <pre id="varB">${escapeHtml(variantB)}</pre>
+      <button class="copy-btn" type="button" onclick="copyText('varB', this)">コピーする</button>
+    </div>
+    <p style="font-size:12px;color:#57776E;margin-top:4px">💡 このまま使わず、1〜2ヶ所を自分の言葉に直すと「あなたの文章」になります。</p>`;
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+function copyText(id, btn) {
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = "コピーしました ✓";
+    setTimeout(() => { btn.textContent = "コピーする"; }, 1600);
+  }).catch(() => {
+    btn.textContent = "長押しでコピーしてください";
+  });
+}
+
+/* ---------- PR slot ---------- */
+function prHTML(pr) {
+  const href = AFF_LINKS[pr.link] || "#";
+  const imp = AFF_IMPRESSIONS[pr.link] || "";
+  return `
+  <div class="pr-slot">
+    <span class="pr-mark">PR</span>${pr.text}<br>
+    → <a href="${href}" target="_blank" rel="noopener nofollow sponsored">${pr.label}</a>
+    ${imp}
+  </div>`;
+}
+
+function resetAll(ev) {
+  ev.preventDefault();
+  if (!confirm("進捗をリセットして、Day1からやり直しますか?")) return;
+  for (let i = 0; i < state.length; i++) state[i] = false;
+  doneCount = 0;
+  saveState();
+  render();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+/* ---------- init ---------- */
+// 診断ツールからの遷移(?type=coconala)は現状ココナラ型のみなのでそのまま表示
+render();
+</script>
+</body>
+</html>
